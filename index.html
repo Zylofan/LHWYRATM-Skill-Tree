@@ -1,0 +1,479 @@
+<!-- You can 100% Data mine this file, so fi you do, please don't share the information you find with anyone and ruin the mystery.-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Skill Tree</title>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+    <style type="text/css">
+      #mynetwork {
+        width: 100%;
+        height: 100%;
+        border: 2px solid lightgray;
+      }
+
+      body {
+        width: 85%;
+        height: 85%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mynetwork"></div>
+    <script>
+      var red = "#db5859";
+      var blue = "#2c89b3";
+      var purple = "#b24c90";
+      var green = "#6dcd97";
+      var yellow = "#ffd17b";
+      var gray = "#787990";
+      var white = "#fafafa";
+      var black = "#010001";
+      var orange = "#ffac89";
+
+      skills = [
+        {
+          id: "health",
+          label: "Health lvl: 11",
+          color: red,
+          shape: "box",
+          title:
+            "Increases your hitpoints by 1 per level. Is one of the only skills not capped at 10.",
+          requirements: [],
+          discovered: true,
+        },
+        {
+          id: "strength",
+          label: "Strength lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases the Strength stat by 1 per level.",
+          requirements: ["health"],
+          discovered: true,
+        },
+        {
+          id: "greaterStrength",
+          label: "Greater Strength lvl: 0",
+          color: red,
+          shape: "box",
+          title: "Increases the Strength stat by 2 per level.",
+          requirements: ["strength"],
+          discovered: false,
+        },
+        {
+          id: "giant'sStrength",
+          label: "Giant's Strength lvl: 0",
+          color: red,
+          shape: "box",
+          title: "Increases the Strength stat by 3 per level.",
+          requirements: ["greaterStrength", "giantKiller"],
+          discovered: false,
+        },
+        {
+          id: "dragon'sStrength",
+          label: "Dragon's Strength lvl: 0",
+          color: red,
+          shape: "box",
+          title: "Increases the Strength stat by 4 per level.",
+          requirements: ["giant'sStrength", "dragonSlayer"],
+          discovered: false,
+        },
+        {
+          id: "speed",
+          label: "Speed lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases the Speed stat by 1 per level.",
+          requirements: ["health"],
+          discovered: true,
+        },
+        {
+          id: "greaterSpeed",
+          label: "Greater Speed lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases the Speed stat by 2 per level.",
+          requirements: ["speed"],
+          discovered: false,
+        },
+        {
+          id: "mythicSpeed",
+          label: "Mythic Speed lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases the Speed stat by 3 per level.",
+          requirements: ["greaterSpeed"],
+          discovered: false,
+        },
+        {
+          id: "perception",
+          label: "perception lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases sight distance by 1 per level.",
+          requirements: ["health"],
+          discovered: true,
+        },
+        {
+          id: "greaterPerception",
+          label: "Greater Perception lvl: 1",
+          color: red,
+          shape: "box",
+          title: "Increases sight distance by 2 per level.",
+          requirements: ["perception"],
+          discovered: true,
+        },
+        {
+          id: "lowLightVision",
+          label: "lowLightVision",
+          color: red,
+          shape: "box",
+          title: "Allows full vision in low light conditions.",
+          requirements: ["perception"],
+          discovered: false,
+        },
+        {
+          id: "swordsman",
+          label: "Swordsman lvl: 0",
+          color: red,
+          shape: "box",
+          title:
+            "Gives the skills to engage in combat with a sword as well as increases sword damage by 1.",
+          requirements: ["health"],
+          discovered: false,
+        },
+        {
+          id: "lumberjack",
+          label: "Lumberjack lvl: 0",
+          color: red,
+          shape: "box",
+          title:
+            "Gives the skills to engage in combat with an ax as well as increases ax damage by 1.",
+          requirements: ["health"],
+          discovered: false,
+        },
+        {
+          id: "archer",
+          label: "Archer lvl: 0",
+          color: red,
+          shape: "box",
+          title:
+            "Gives the skills to engage in combat with a bow or crossbow as well as increases their damage by 1.",
+          requirements: ["health"],
+          discovered: false,
+        },
+        {
+          id: "lancer",
+          label: "Lancer lvl: 0",
+          color: red,
+          shape: "box",
+          title:
+            "Gives the skills to engage in combat with a lance or spear as well as increases their damage by 1.",
+          requirements: ["health"],
+          discovered: false,
+        },
+        {
+          id: "mana",
+          label: "Mana lvl:1",
+          color: blue,
+          shape: "box",
+          title:
+            "Increases your mana by 1 per level. Is one of the only skills not capped at 10.",
+          requirements: [],
+          discovered: true,
+        },
+        {
+          id: "wisdom",
+          label: "Wisdom lvl:0",
+          color: blue,
+          shape: "box",
+          title: "Increases the effect of all spells by 1.",
+          requirements: ["mana"],
+          discovered: false,
+        },
+        {
+          id: "greaterWisdom",
+          label: "Greater Wisdom lvl:0",
+          color: blue,
+          shape: "box",
+          title: "Increases the effect of all spells by 2.",
+          requirements: ["wisdom"],
+          discovered: false,
+        },
+        {
+          id: "speach",
+          label: "Speach",
+          color: blue,
+          shape: "box",
+          title: "Gain the ability to speak common.",
+          requirements: ["wisdom"],
+          discovered: false,
+        },
+        {
+          id: "languageGoblin",
+          label: "Language Goblin",
+          color: blue,
+          shape: "box",
+          title: "Can understand and speak goblin.",
+          requirements: ["speach"],
+          discovered: false,
+        },
+        {
+          id: "languageElvin",
+          label: "Language Elvin",
+          color: blue,
+          shape: "box",
+          title: "Can understand and speak elvin.",
+          requirements: ["speach"],
+          discovered: false,
+        },
+
+        {
+          id: "magicPerception",
+          label: "Magic Perception lvl:0",
+          color: purple,
+          shape: "box",
+          title:
+            "Allows you to be able to see the threads of magic around you.",
+          requirements: ["mana", "perception"],
+          discovered: false,
+        },
+        {
+          id: "magicSense",
+          label: "Magic Sense lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to sense the threads of magic around you\nwithout the need for sight.",
+          requirements: ["mana", "magicPerception"],
+          discovered: false,
+        },
+        {
+          id: "magicManipulation",
+          label: "Magic Manipulation lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to manipulate the threads of magic around you, weaving them into spells.",
+          requirements: ["mana"],
+          discovered: false,
+        },
+        {
+          id: "fireMagic",
+          label: "Fire Magic lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to cast basic fire spells, also increase fire spell damage by 1.",
+          requirements: ["magicManipulation"],
+          discovered: false,
+        },
+        {
+          id: "waterMagic",
+          label: "Water Magic lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to cast basic water spells, also increase water spell damage by 1.",
+          requirements: ["magicManipulation"],
+          discovered: false,
+        },
+        {
+          id: "eartMagic",
+          label: "Earth Magic lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to cast basic earth spells, also increase earth spell damage by 1.",
+          requirements: ["magicManipulation"],
+          discovered: false,
+        },
+        {
+          id: "windMagic",
+          label: "Wind Magic lvl:0",
+          color: blue,
+          shape: "box",
+          title:
+            "Allows you to be able to cast basic wind spells, also increase wind spell damage by 1.",
+          requirements: ["magicManipulation"],
+          discovered: false,
+        },
+        {
+          id: "achievments",
+          label: "Achivements",
+          color: orange,
+          shape: "box",
+          title: "Allows the aquisiton of achivement skills.",
+          requirements: [],
+          discovered: true,
+        },
+        {
+          id: "giantKiller",
+          label: "Giant Killer",
+          color: orange,
+          shape: "box",
+          title:
+            "You have slain a giant class entity. Increase's Health and Strength by 2",
+          requirements: ["achievments"],
+          discovered: false,
+        },
+        {
+          id: "slimeKiller",
+          label: "Slime Killer",
+          color: orange,
+          shape: "box",
+          title: "You have slain your first slime. Increase's Health by 1",
+          requirements: ["achievments"],
+          discovered: false,
+        },
+        {
+          id: "monsterous",
+          label: "Monsterous",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title:
+            "You are a monster and gain access to the Monster skill tree. You may not\ncollect experience but may steal 1 skill from any foe you slay of equal or higher level.\nPC's always count as equal to your level.",
+          requirements: [],
+          discovered: true,
+        },
+        {
+          id: "rat",
+          label: "Rat",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You are a rat",
+          requirements: ["monsterous"],
+          discovered: false,
+        },
+        {
+          id: "snake",
+          label: "Snake",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You are a snake",
+          requirements: ["monsterous"],
+          discovered: false,
+        },
+        {
+          id: "slime",
+          label: "Slime",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You are a slime",
+          requirements: ["monsterous"],
+          discovered: false,
+        },
+        {
+          id: "bat",
+          label: "Bat",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You are a bat",
+          requirements: ["monsterous"],
+          discovered: true,
+        },
+        {
+          id: "fangs",
+          label: "Fangs lvl:1",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title:
+            "You have fangs and may attack with them. Also increases fang damage by 1.",
+          requirements: ["bat"],
+          discovered: true,
+        },
+        {
+          id: "batWings",
+          label: "Bat Wings",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You have bat wings that will allow you to fly",
+          requirements: ["bat"],
+          discovered: true,
+        },
+        {
+          id: "Batblindness",
+          label: "Bat Blindness",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "Removes the benefits of the perception skill",
+          requirements: ["bat"],
+          discovered: true,
+        },
+        {
+          id: "echolocation",
+          label: "Echolocation lvl:1",
+          color: gray,
+          font: { color: "white" },
+          shape: "box",
+          title: "You can see by emmiting sound.",
+          requirements: ["bat"],
+          discovered: true,
+        },
+        {
+          id: "???",
+          label: "▀▁▎▕▊▒▎░▀▀▁", //useSkills without prerequisit at cost of hp.
+          color: black,
+          font: { color: "white" },
+          shape: "box",
+          title: "???",
+          requirements: [],
+          discovered: true,
+        },
+      ];
+
+      function editNodesInJSON(nodes) {
+        nodes.forEach(function (node) {
+          if (node.discovered == false) {
+            node.label = "???";
+            node.title = "???";
+          }
+        });
+        return nodes;
+      }
+
+      function generateEdgesFromJSON(data) {
+        var edges = [];
+        data.forEach(function (node) {
+          var destinations = node.requirements;
+          for (i = 0; i < destinations.length; i++) {
+            edges.push({ to: node.id, from: destinations[i], arrows: "to" });
+          }
+        });
+        return edges;
+      }
+    </script>
+    <script type="text/javascript">
+      // create an array with nodes
+      var nodes = new vis.DataSet(editNodesInJSON(skills));
+
+      // create an array with edges
+      var edges = new vis.DataSet(generateEdgesFromJSON(skills));
+
+      // create a network
+      var container = document.getElementById("mynetwork");
+      var data = {
+        nodes: nodes,
+        edges: edges,
+      };
+      var options = {};
+      var network = new vis.Network(container, data, options);
+    </script>
+  </body>
+</html>
